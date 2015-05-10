@@ -1,7 +1,9 @@
 # Django settings for map_route project.
-
+import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -11,12 +13,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE' : 'django_mongodb_engine',
-        'NAME' : 'map_route',
-        'USER': '',
-        'PASSWORD': '',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'map_route',
+        'USER': 'root',
+        'PASSWORD': 'root',
         'HOST': '127.0.0.1',
-        'PORT': '27017',
+        'PORT': '3306',
     }
 }
 
@@ -149,14 +151,14 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(os.path.dirname(__file__), '..', 'static').replace('\\','/'),)
 ROOT_PATH = os.path.dirname(__file__)
 STATIC_ROOT = os.path.join(ROOT_PATH, 'static')
-LOGIN_URL='/'
+LOGIN_URL = '/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\','/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/')
 MEDIA_URL = '/media/'
 
 EMAIL_USE_TLS = True
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'jay.m.ntech@gmail.com'
+EMAIL_HOST_USER = 'scorpionspython@gmail.com'
 EMAIL_HOST_PASSWORD = 'my@password'
 EMAIL_PORT = 587
