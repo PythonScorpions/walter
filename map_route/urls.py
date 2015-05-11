@@ -7,6 +7,7 @@ from userapp import views
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', views.index_view.as_view(), name="login_user"),
+    url(r'^/maps$', views.map_view.as_view(), name="maps"),
     # url(r'^map_route/', include('map_route.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
