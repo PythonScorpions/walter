@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Remove Markers</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places"></script>
+    <style>
+      html, body
+      {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+      #map-canvas {
+        height: 500px;
+          width: 500px;
+        margin: 0px;
+        padding: 0px;
+          float: left;
+      }
+      #infoPanel {
+        float: left;
+        margin-left: 10px;
+      }
+      #infoPanel div {
+        margin-bottom: 5px;
+      }
+        /*below are google search */
+      .controls {
+        margin-top: 16px;
+        border: 1px solid transparent;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        height: 32px;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      #pac-input {
+        background-color: #fff;
+        padding: 0 11px 0 13px;
+        width: 400px;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        text-overflow: ellipsis;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+        margin-left: -1px;
+        padding-left: 14px;  /* Regular padding-left + 1. */
+        width: 401px;
+      }
+      #type-selector label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+
+    </style>
+    <title>Places search box</title>
+
+    <script>
+var map;
+var markers = [];
+
+// drag make possible
+
+var geocoder = new google.maps.Geocoder();
+
+function geocodePosition(pos) {
+  geocoder.geocode({
+    latLng: pos
+  }, function(responses) {
+    if (responses && responses.length > 0) {
+      updateMarkerAddress(responses[0].formatted_address);
+    } else {
+      updateMarkerAddress('Cannot determine address at this location.');
+    }
+  });
+}
+
+function updateMarkerStatus(str) {
+  document.getElementById('markerStatus').innerHTML = str;
+}
+
+function updateMarkerPosition(latLng) {
+  document.getElementById('info').innerHTML = [
+    latLng.lat(),
+    latLng.lng()
+  ].join(', ');
+}
+
+function updateMarkerAddress(str) {
+  document.getElementById('address').innerHTML = str;
+}
+// drag end
+    var mj;
+function initialize() {
+  var haightAshbury = new google.maps.LatLng(37.7699298, -122.4469157);
+  map = new google.maps.Map(document.getElementById('map-canvas'), {
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  });
+
+      var defaultBounds = new google.maps.LatLngBounds(
+      new google.maps.LatLng(-33.8902, 151.1759),
+      new google.maps.LatLng(-33.8474, 151.2631));
+  map.fitBounds(defaultBounds);
+//   map.setZoom(10);
+
+      var input = /** @type {HTMLInputElement} */(
+      document.getElementById('pac-input'));
+  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+  var searchBox = new google.maps.places.SearchBox(
+    /** @type {HTMLInputElement} */(input));
+
+ // search function start here
+  google.maps.event.addListener(searchBox, 'places_changed', function() {
+    var places = searchBox.getPlaces();
+    if (places.length == 0) {
+      return;
+    }
+    for (var i = 0, marker; marker = markers[i]; i++) {
+      marker.setMap(null);
+    }
+    // For each place, get the icon, place name, and location.
+    var bounds = new google.maps.LatLngBounds();
+    for (var i = 0, place; place = places[i]; i++) {
+      // Create a marker for each place.
+       marker = new google.maps.Marker({
+        map: map,
+        title: place.name,
+        position: place.geometry.location,
+        draggable: true
+      });
+    $(".latitude").val(place.geometry.location.lat());
+    $(".longitude").val(place.geometry.location.lng());
+    updateMarkerPosition(marker.getPosition());
+    geocodePosition(marker.getPosition());
+  // Add dragging event listeners.
+  google.maps.event.addListener(marker, 'dragstart', function() {
+    updateMarkerAddress('Dragging...');
+  });
+
+  google.maps.event.addListener(marker, 'drag', function() {
+    updateMarkerStatus('Dragging...');
+    updateMarkerPosition(marker.getPosition());
+  });
+
+  google.maps.event.addListener(marker, 'dragend', function() {
+    updateMarkerStatus('Drag ended');
+    geocodePosition(marker.getPosition());
+    $(".latitude").val(marker.getPosition().lat());
+    $(".longitude").val(marker.getPosition().lat());
+  });
+
+      markers.push(marker);
+
+      bounds.extend(place.geometry.location);
+    }
+
+    map.fitBounds(bounds);
+  });
+
+    google.maps.event.addListener(map, 'bounds_changed', function() {
+    var bounds = map.getBounds();
+    searchBox.setBounds(bounds);
+    map.setZoom(14);
+  });
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+    <style>
+      #target {
+        width: 345px;
+      }
+    </style>
+  </head>
+  <body>
+      <div>
+      <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+          <div id="map-canvas"></div>
+      </div>
+          <p>Click on the map to add markers.</p>
+      <p>
+          <form method="post" action="">
+          <h1> latitude is : <input TYPE="text" NAME="latitude" class="latitude" value="" /> </h1>
+          <h1>longitude is : <input TYPE="text" NAME="longitude" class="longitude" value="" /> </h1>
+      <h3>
+          <div id="infoPanel">
+          <b>Marker status:</b>
+          <div id="markerStatus"><i>Click and drag the marker.</i></div>
+          <b>Current position:</b>
+          <div id="info"></div>
+          <b>Closest matching address:</b>
+          <div id="address"></div>
+        </div>
+
+      </h3>
+          </form>
+      </p>
+  </body>
+</html>
